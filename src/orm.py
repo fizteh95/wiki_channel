@@ -19,6 +19,7 @@ region_table = Table(
     Column("utc_hour_to_send_day", Integer),
     Column("utc_minute_to_send_day", Integer),
     Column("interval_for_goof_article", Integer),
+    Column("main_page_suffix", String),
 )
 
 article_day_table = Table(
