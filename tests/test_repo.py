@@ -33,10 +33,18 @@ async def test_article_day_create(
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
     first_article_of_day = ArticleDay(
-        region=1, summary=str(uuid.uuid4()), link=str(uuid.uuid4()), send_time=datetime.datetime.now(datetime.UTC)
+        region=1,
+        summary=str(uuid.uuid4()),
+        link=str(uuid.uuid4()),
+        image_link=str(uuid.uuid4()),
+        send_time=datetime.datetime.now(datetime.UTC),
     )
     second_article_of_day = ArticleDay(
-        region=1, summary=str(uuid.uuid4()), link=str(uuid.uuid4()), send_time=datetime.datetime.now(datetime.UTC)
+        region=1,
+        summary=str(uuid.uuid4()),
+        link=str(uuid.uuid4()),
+        image_link=str(uuid.uuid4()),
+        send_time=datetime.datetime.now(datetime.UTC),
     )
 
     async with uow.atomic() as repo:
@@ -62,10 +70,18 @@ async def test_article_good_create(
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
     first_article_good = ArticleGood(
-        region=1, summary=str(uuid.uuid4()), link=str(uuid.uuid4()), send_time=datetime.datetime.now(datetime.UTC)
+        region=1,
+        summary=str(uuid.uuid4()),
+        link=str(uuid.uuid4()),
+        image_link=str(uuid.uuid4()),
+        send_time=datetime.datetime.now(datetime.UTC),
     )
     second_article_of_good = ArticleGood(
-        region=1, summary=str(uuid.uuid4()), link=str(uuid.uuid4()), send_time=datetime.datetime.now(datetime.UTC)
+        region=1,
+        summary=str(uuid.uuid4()),
+        link=str(uuid.uuid4()),
+        image_link=str(uuid.uuid4()),
+        send_time=datetime.datetime.now(datetime.UTC),
     )
 
     async with uow.atomic() as repo:

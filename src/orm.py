@@ -27,6 +27,7 @@ article_day_table = Table(
     Column("id", Integer, primary_key=True),
     Column("region", Integer, ForeignKey("region.id")),
     Column("link", String),
+    Column("image_link", String),
     Column("summary", String),
     Column("send_time", DateTime(timezone=True), server_default=func.now()),
 )
@@ -37,6 +38,7 @@ article_good_table = Table(
     Column("id", Integer, primary_key=True),
     Column("region", Integer, ForeignKey("region.id")),
     Column("link", String),
+    Column("image_link", String),
     Column("summary", String),
     Column("send_time", DateTime(timezone=True), server_default=func.now()),
 )

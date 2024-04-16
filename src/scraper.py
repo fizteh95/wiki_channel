@@ -1,17 +1,17 @@
-import aiohttp
-from bs4 import BeautifulSoup
 from urllib import parse
 
-from src.models import RegionPublic, ArticleDay, ArticleGood
-from src.pipeline import ArticleScraper
-
+import aiohttp
 import wikipedia
+from bs4 import BeautifulSoup
+
+from src.models import ArticleDay, ArticleGood, RegionPublic
+from src.pipeline import ArticleScraper
 
 
 class Scraper(ArticleScraper):
     async def get_article_of_day(self, region: RegionPublic) -> ArticleDay:
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://ru.wikipedia.org/wiki/Заглавная_страница') as resp:
+            async with session.get("https://ru.wikipedia.org/wiki/Заглавная_страница") as resp:
                 print(resp.status)
                 # print(await resp.text())
 

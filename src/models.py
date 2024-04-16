@@ -16,6 +16,7 @@ class RegionPublic:
 class Article:
     region: int  # region: RegionPublic
     link: str
+    image_link: str
     summary: str
     send_time: datetime.datetime
 
