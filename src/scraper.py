@@ -1,21 +1,24 @@
+import random
 from urllib import parse
 
 import aiohttp
+import bs4.element
 # import wikipedia
 from bs4 import BeautifulSoup
 
-from src.models import ArticleDay, ArticleGood, RegionPublic
+from src.models import ArticleDay, ArticleGood, RegionPublic, ArticleGoodPreparsed
 from src.pipeline import ArticleScraper
 
 
 class Scraper(ArticleScraper):
-    async def get_article_of_day(self, region: RegionPublic) -> ArticleDay:
+    async def download_main_page(self, region: RegionPublic) -> str:
         url = f"https://{region.country_code}.wikipedia.org/wiki/{region.main_page_suffix}"
-        # "https://ru.wikipedia.org/wiki/Заглавная_страница"
         async with aiohttp.ClientSession() as session:
             async with session.get(url=url) as resp:
-                content = await resp.text()
+                content: str = await resp.text()
+        return content
 
+    async def parse_main_page(self, content: str, region: RegionPublic) -> ArticleDay:
         soup = BeautifulSoup(content, "html.parser")
         article_of_day = soup.find("div", class_="fake-heading h2 main-header")
         encoded_link = article_of_day.find("a").get("href")
@@ -38,5 +41,75 @@ class Scraper(ArticleScraper):
         )
         return article
 
+    async def get_article_of_day(self, region: RegionPublic) -> ArticleDay:
+        content = await self.download_main_page(region=region)
+        article = await self.parse_main_page(content=content, region=region)
+        return article
+
+    async def download_good_article_table(self, region: RegionPublic) -> str:
+        url = f"https://{region.country_code}.wikipedia.org/wiki/{region.favourite_page_suffix}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url) as resp:
+                content: str = await resp.text()
+        return content
+
+    async def parse_good_article_table(self, content: str) -> list[ArticleGoodPreparsed]:
+        soup = BeautifulSoup(content, "html.parser")
+        articles_table = soup.select_one(
+            selector="#mw-content-text > div.mw-content-ltr.mw-parser-output > table > tbody > tr > td > table:nth-child(13) > tbody > tr"
+        )
+        articles = articles_table.findAll("a")
+        result: list[ArticleGoodPreparsed] = []
+        for a in articles:
+            if not a.get("href").startswith("https://commons.wikimedia.org/wiki/File"):
+                preparsed_article = ArticleGoodPreparsed(
+                    link=parse.unquote(a.get("href")),
+                    title=a.get("title")
+                )
+                result.append(preparsed_article)
+        return result
+
+    async def download_good_article(self, article: ArticleGoodPreparsed) -> str:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=article.link) as resp:
+                content: str = await resp.text()
+        return content
+
+    async def parse_good_article(self, content: str, region: RegionPublic, link: str) -> ArticleGood:
+        res_text = ""
+        soup = BeautifulSoup(content, "html.parser")
+        head_content = soup.select_one(selector="#mw-content-text > div.mw-content-ltr.mw-parser-output")
+        start = False
+        stop = False
+        head_childran = head_content.childGenerator()
+        for child in head_childran:
+            if not start and not stop and child.name == "p":
+                start = True
+            if start and not stop and child.name != "p":
+                stop = True
+            if (start or stop) and not (start and stop):
+                res_text += child.text
+
+        images = soup.findAll("img")
+        unquoted_image_link = ""
+        for i in images:
+            if i.get("alt") in ["Эта статья входит в число статей года", "Эта статья входит в число избранных"]:
+                continue
+            unquoted_image_link = parse.unquote(i.get("src"))
+            break
+
+        article = ArticleGood(
+            region=region.id,  # typing: ignore  # noqa
+            link=link,
+            image_link=unquoted_image_link,
+            summary=res_text,
+        )
+        return article
+
     async def get_random_good_article(self, region: RegionPublic) -> ArticleGood:
-        raise NotImplementedError
+        content = await self.download_good_article_table(region=region)
+        article_list = await self.parse_good_article_table(content=content)
+        unparsed_article = random.choice(article_list)
+        article_content = await self.download_good_article(article=unparsed_article)
+        article = await self.parse_good_article(content=article_content, region=region, link=unparsed_article.link)
+        return article

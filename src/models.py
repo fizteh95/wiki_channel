@@ -11,6 +11,7 @@ class RegionPublic:
     utc_minute_to_send_day: int
     interval_for_goof_article: int
     main_page_suffix: str
+    favourite_page_suffix: str
 
 
 @dataclass
@@ -34,3 +35,12 @@ class ArticleGood(Article):
     """
     Хорошая статья
     """
+
+
+@dataclass
+class ArticleGoodPreparsed:
+    """
+    Заготовка для хороших статей
+    """
+    link: str
+    title: str

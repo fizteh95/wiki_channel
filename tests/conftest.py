@@ -37,7 +37,8 @@ def first_region() -> RegionPublic:
         utc_hour_to_send_day=10,
         utc_minute_to_send_day=20,
         interval_for_goof_article=30,
-        main_page_suffix="Заглавная_страница"
+        main_page_suffix="Заглавная_страница",
+        favourite_page_suffix="Википедия:Избранные_статьи"
     )
     region.id = 1
     return region
