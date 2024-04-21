@@ -28,6 +28,8 @@ class Scraper(ArticleScraper):
         all_text = text_container.find("div", "main-box-content")
         article_text = all_text.find("p").text
 
+        # TODO: get image true link
+
         article = ArticleDay(
             region=region.id,  # typing: ignore  # noqa
             link=f"https://{region.country_code}.wikipedia.org" + link,

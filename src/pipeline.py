@@ -74,7 +74,7 @@ class ArticleFlow:
             return True
         return False
 
-    async def send_article_good(self, last_article_good: ArticleGood, new_article: ArticleGood) -> bool:
+    async def send_article_good(self, last_article_good: ArticleGood) -> bool:
         now = datetime.datetime.now(datetime.UTC)
         if (now - last_article_good.send_time).seconds // 60 >= self.region.interval_for_goof_article:
             return True
@@ -96,7 +96,7 @@ class ArticleFlow:
         new_article_good = await scraper.get_random_good_article(region=self.region)
         async with self.uow.atomic() as repo:
             last_article_good = await repo.get_last_good_article(region_code=self.region.country_code)
-            to_send = await self.send_article_good(last_article_good=last_article_good, new_article=new_article_good)
+            to_send = await self.send_article_good(last_article_good=last_article_good)
             if not to_send:
                 return
             await self.sender.send_article(article=new_article_good)
