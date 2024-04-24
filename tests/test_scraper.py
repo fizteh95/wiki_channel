@@ -23,7 +23,7 @@ async def test_parsing_article_good_table(first_region: RegionPublic) -> None:
     with open("./tests/resources/favourite_articles.html", "r", encoding="utf-8") as file:
         content = file.read()
 
-    a = await s.parse_good_article_table(content=content)
+    a = await s.parse_good_article_table(content=content, region=first_region)
 
     assert len(a) >= 1876
 
@@ -40,5 +40,21 @@ async def test_parsing_good_article(first_region: RegionPublic) -> None:
 
 
 @pytest.mark.asyncio
+async def test_get_fullsize_image() -> None:
+    s = Scraper()
+    p = await s.get_fullsize_image(page_link="https://ru.wikipedia.org/wiki/Файл:IngriaLenobl.jpg")
+    assert p
+
+
+@pytest.mark.asyncio
 async def test_get_article_day(first_region: RegionPublic) -> None:
-    ...
+    s = Scraper()
+    a = await s.get_article_of_day(region=first_region)
+    assert a
+
+
+@pytest.mark.asyncio
+async def test_get_article_good(first_region: RegionPublic) -> None:
+    s = Scraper()
+    a = await s.get_random_good_article(region=first_region)
+    assert a

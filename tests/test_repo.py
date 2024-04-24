@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import typing as tp
 import uuid
@@ -12,7 +13,10 @@ from src.uow import UnitOfWork
 
 @pytest.mark.asyncio
 async def test_region_create(
-    session_factory: tp.Callable[[], tp.Any], first_region: RegionPublic, second_region: RegionPublic
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    second_region: RegionPublic,
+    remove_old_data: tp.Any,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
@@ -23,24 +27,34 @@ async def test_region_create(
     async with uow.atomic() as repo:
         regions = await repo.get_regions()
 
+    # await asyncio.sleep(100)
+
     assert regions == [first_region, second_region]
 
 
 @pytest.mark.asyncio
 async def test_article_day_create(
-    session_factory: tp.Callable[[], tp.Any], first_region: RegionPublic, second_region: RegionPublic
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    second_region: RegionPublic,
+    remove_old_data: tp.Any,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
+    async with uow.atomic() as repo:
+        await repo.create_region(region=first_region)
+
+    # await asyncio.sleep(300)
+
     first_article_of_day = ArticleDay(
-        region=1,
+        region="ru",
         summary=str(uuid.uuid4()),
         link=str(uuid.uuid4()),
         image_link=str(uuid.uuid4()),
         send_time=datetime.datetime.now(datetime.UTC),
     )
     second_article_of_day = ArticleDay(
-        region=1,
+        region="ru",
         summary=str(uuid.uuid4()),
         link=str(uuid.uuid4()),
         image_link=str(uuid.uuid4()),
@@ -65,19 +79,27 @@ async def test_article_day_create(
 
 @pytest.mark.asyncio
 async def test_article_good_create(
-    session_factory: tp.Callable[[], tp.Any], first_region: RegionPublic, second_region: RegionPublic
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    second_region: RegionPublic,
+    remove_old_data: tp.Any,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
+    print("tp1")
+    async with uow.atomic() as repo:
+        await repo.create_region(region=first_region)
+    print("tp2")
+
     first_article_good = ArticleGood(
-        region=1,
+        region="ru",
         summary=str(uuid.uuid4()),
         link=str(uuid.uuid4()),
         image_link=str(uuid.uuid4()),
         send_time=datetime.datetime.now(datetime.UTC),
     )
     second_article_of_good = ArticleGood(
-        region=1,
+        region="ru",
         summary=str(uuid.uuid4()),
         link=str(uuid.uuid4()),
         image_link=str(uuid.uuid4()),
@@ -101,7 +123,9 @@ async def test_article_good_create(
 
 
 @pytest.mark.asyncio
-async def test_region_has_id(session_factory: tp.Callable[[], tp.Any], first_region: RegionPublic) -> None:
+async def test_region_has_id(
+    session_factory: tp.Callable[[], tp.Any], first_region: RegionPublic, remove_old_data: tp.Any
+) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
 
     async with uow.atomic() as repo:

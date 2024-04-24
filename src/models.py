@@ -16,7 +16,7 @@ class RegionPublic:
 
 @dataclass
 class Article:
-    region: int  # region: RegionPublic
+    region: str  # region: RegionPublic
     link: str
     image_link: str
     summary: str
@@ -42,5 +42,6 @@ class ArticleGoodPreparsed:
     """
     Заготовка для хороших статей
     """
+
     link: str
     title: str
