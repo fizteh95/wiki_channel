@@ -1,5 +1,7 @@
 import asyncio
 import datetime
+import json
+import re
 import typing as tp
 from abc import ABC, abstractmethod
 
@@ -63,12 +65,13 @@ class ArticleFlow:
     @staticmethod
     async def summary_prune(article: Article) -> None:
         print(article.summary[:2000])
+        pattern = r"\[\d+\]|\[~ \d+\]|\[⇨\]|\[K \d+\]"
+        article.summary = re.sub(pattern, "", article.summary)
         if len(article.summary) <= 1024:
             return
         counter = 0
         print(len(article.summary))
         # TODO: make prune normal
-        # TODO: remove [1] - references
         while len(article.summary) > 1024 and counter < 30:
             counter += 1
             print(len(article.summary))
@@ -95,13 +98,35 @@ class ArticleFlow:
             return True
         return False
 
+    @staticmethod
+    def prepare_time(time_str: str) -> datetime.datetime:
+        hour = int(time_str.split(":")[0])
+        minute = int(time_str.split(":")[1])
+        return datetime.datetime.now(datetime.UTC).replace(hour=hour, minute=minute, second=0, microsecond=0)
+
     async def send_article_good(self, last_article_good: ArticleGood | None) -> bool:
-        if last_article_good is None:
-            return True
         now = datetime.datetime.now(datetime.UTC)
-        if (now - last_article_good.send_time).seconds // 60 >= self.region.interval_for_goof_article:
+        first_time_str = json.loads(self.region.intervals_for_good_article)[0]
+        first_time = self.prepare_time(first_time_str)
+        if last_article_good is None and now >= first_time:
             return True
-        return False
+        elif last_article_good is None:
+            return False
+        # if (now - last_article_good.send_time).seconds // 60 >= self.region.intervals_for_good_article:
+        #     return True
+        """
+        now
+        last sent
+        [time1, time2, time3]
+        """
+        times_list = json.loads(self.region.intervals_for_good_article)
+        time_to_send = list(filter(lambda x: self.prepare_time(x) > (now - datetime.timedelta(minutes=7)), times_list))[0]
+        prepared_time_to_send = self.prepare_time(time_to_send)
+        if prepared_time_to_send > now:
+            return False
+        if last_article_good.send_time >= prepared_time_to_send:
+            return False
+        return True
 
     async def article_day_scheduled(self) -> None:
         scraper = self.scraper()
@@ -121,7 +146,6 @@ class ArticleFlow:
 
     async def article_good_scheduled(self) -> None:
         scraper = self.scraper()
-        new_article_good = await scraper.get_random_good_article(region=self.region)
         print("scraped")
         async with self.uow.atomic() as repo:
             last_article_good = await repo.get_last_good_article(region_code=self.region.country_code)
@@ -129,6 +153,7 @@ class ArticleFlow:
             print(f"to send good: {to_send}")
             if not to_send:
                 return
+            new_article_good = await scraper.get_random_good_article(region=self.region)
             await self.summary_prune(article=new_article_good)
             print("pruned")
             await repo.create_good_article(article=new_article_good)
@@ -138,10 +163,10 @@ class ArticleFlow:
         while self.ad_loop:
             try:
                 await self.article_day_scheduled()
-                await asyncio.sleep(53)
+                await asyncio.sleep(179)
             except Exception as e:
                 print(f"ad loop exception: {e}")
-                await asyncio.sleep(180)
+                await asyncio.sleep(1)
 
     async def article_good_loop(self) -> None:
         while self.ag_loop:
@@ -149,5 +174,5 @@ class ArticleFlow:
                 await self.article_good_scheduled()
                 await asyncio.sleep(53)
             except Exception as e:
-                print(f"ad loop exception: {e}")
+                print(f"ag loop exception: {e}")
                 await asyncio.sleep(180)

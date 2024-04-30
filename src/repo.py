@@ -36,7 +36,7 @@ class Repository(DBCollaborator, AbstractRepo):
         articles = await self.session.scalars(
             select(ArticleDay)
             .where(cast("ColumnElement[bool]", ArticleDay.region == region.country_code))
-            .order_by(cast("ColumnElement[datetime.datetime]", ArticleDay.send_time.desc()))
+            .order_by(cast("ColumnElement[datetime.datetime]", ArticleDay.send_time.desc()))  # type: ignore
         )
         article: ArticleDay | None = articles.first()
         return article
@@ -51,12 +51,12 @@ class Repository(DBCollaborator, AbstractRepo):
         articles = await self.session.scalars(
             select(ArticleGood)
             .where(cast("ColumnElement[bool]", ArticleGood.region == region.country_code))
-            .order_by(cast("ColumnElement[datetime.datetime]", ArticleGood.send_time.desc()))
+            .order_by(cast("ColumnElement[datetime.datetime]", ArticleGood.send_time.desc()))  # type: ignore
         )
         article: ArticleGood | None = articles.first()
         return article
 
     async def remove_all(self) -> None:
-        await self.session.execute(delete(RegionPublic).where(RegionPublic.id > 0))
-        await self.session.execute(delete(ArticleDay).where(ArticleDay.id > 0))
-        await self.session.execute(delete(ArticleGood).where(ArticleGood.id > 0))
+        await self.session.execute(delete(RegionPublic).where(RegionPublic.id > 0))  # type: ignore
+        await self.session.execute(delete(ArticleDay).where(ArticleDay.id > 0))  # type: ignore
+        await self.session.execute(delete(ArticleGood).where(ArticleGood.id > 0))  # type: ignore

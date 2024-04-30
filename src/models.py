@@ -9,7 +9,7 @@ class RegionPublic:
     channel_id: str
     utc_hour_to_send_day: int
     utc_minute_to_send_day: int
-    interval_for_goof_article: int
+    intervals_for_good_article: str
     main_page_suffix: str
     favourite_page_suffix: str
 
@@ -18,7 +18,7 @@ class RegionPublic:
 class Article:
     region: str  # region: RegionPublic
     link: str
-    image_link: str
+    image_link: str | None
     summary: str
     send_time: datetime.datetime | None = None
 

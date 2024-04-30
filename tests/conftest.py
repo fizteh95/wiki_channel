@@ -49,7 +49,7 @@ def first_region() -> RegionPublic:
         channel_id=str(uuid.uuid4()),
         utc_hour_to_send_day=10,
         utc_minute_to_send_day=20,
-        interval_for_goof_article=30,
+        intervals_for_good_article='["10:00", "12:00", "16:00", "20:00"]',
         main_page_suffix="Заглавная_страница",
         favourite_page_suffix="Википедия:Избранные_статьи",
     )
@@ -65,7 +65,7 @@ def second_region() -> RegionPublic:
         channel_id=str(uuid.uuid4()),
         utc_hour_to_send_day=12,
         utc_minute_to_send_day=00,
-        interval_for_goof_article=15,
+        intervals_for_good_article='["10:00", "12:00", "16:00", "20:00"]',
         main_page_suffix="en",
         favourite_page_suffix="1123",
     )

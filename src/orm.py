@@ -18,7 +18,7 @@ region_table = Table(
     Column("channel_id", String),
     Column("utc_hour_to_send_day", Integer),
     Column("utc_minute_to_send_day", Integer),
-    Column("interval_for_goof_article", Integer),
+    Column("intervals_for_good_article", String),
     Column("main_page_suffix", String),
     Column("favourite_page_suffix", String),
 )
