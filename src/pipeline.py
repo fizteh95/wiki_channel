@@ -111,6 +111,7 @@ class ArticleFlow:
         if last_article_good is None and now >= first_time:
             return True
         elif last_article_good is None:
+            print("tp000 last good article is none")
             return False
         # if (now - last_article_good.send_time).seconds // 60 >= self.region.intervals_for_good_article:
         #     return True
@@ -119,12 +120,21 @@ class ArticleFlow:
         last sent
         [time1, time2, time3]
         """
+        print(now)
         times_list = json.loads(self.region.intervals_for_good_article)
-        time_to_send = list(filter(lambda x: self.prepare_time(x) > (now - datetime.timedelta(minutes=7)), times_list))[0]
+        print(f"tp00 times_list {times_list}")
+        times_to_send = list(filter(lambda x: self.prepare_time(x) > (now - datetime.timedelta(minutes=7)), times_list))
+        if len(times_to_send) == 0:
+            print("no time is greater then now")
+            return False
+        time_to_send = times_to_send[0]
+        print(f"tp01 time_to_send {time_to_send}")
         prepared_time_to_send = self.prepare_time(time_to_send)
         if prepared_time_to_send > now:
+            print(f"tp02 prepared time is greater then now")
             return False
         if last_article_good.send_time >= prepared_time_to_send:
+            print(f"tp03 last article time greater then prepared time")
             return False
         return True
 

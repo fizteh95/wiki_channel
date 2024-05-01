@@ -58,5 +58,5 @@ SQLAlchemy==2.0.29
 typer==0.12.3
 typing_extensions==4.11.0
 urllib3==2.2.1
-wikipedia==1.4.0
+# wikipedia==1.4.0
 yarl==1.9.4
