@@ -20,9 +20,12 @@ class TgSender(AbstractSender):
             await self.bot.send_message(
                 chat_id=region_channel,
                 text=article.summary,
+                parse_mode="HTML",
             )
         else:
-            await self.bot.send_photo(chat_id=region_channel, caption=article.summary, photo=article.image_link)
+            await self.bot.send_photo(
+                chat_id=region_channel, caption=article.summary, photo=article.image_link, parse_mode="HTML"
+            )
 
     # async def start_polling(self) -> None:
     #     # await self.bot.send_message(
