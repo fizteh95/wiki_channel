@@ -192,16 +192,16 @@ class ArticleFlow:
         while self.ad_loop:
             try:
                 await self.article_day_scheduled()
-                await asyncio.sleep(1)
+                await asyncio.sleep(299)
             except Exception as e:
                 print(f"ad loop exception: {e}")
-                await asyncio.sleep(1)
+                await asyncio.sleep(179)
 
     async def article_good_loop(self) -> None:
         while self.ag_loop:
             try:
                 await self.article_good_scheduled()
-                await asyncio.sleep(1)
+                await asyncio.sleep(50)
             except Exception as e:
                 print(f"ag loop exception: {e}")
-                await asyncio.sleep(1)
+                await asyncio.sleep(179)
