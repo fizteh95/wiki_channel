@@ -1,11 +1,11 @@
 import asyncio
+import typing as tp
 
 import typer
 from alembic import command
 from alembic.config import Config
-import typing as tp
 
-from src.bootstrap import bootstrap
+from src.bootstrap import bootstrap, bootstrap_for_probe
 from src.sender import TgSender
 
 app = typer.Typer()
@@ -16,6 +16,11 @@ async def start_service() -> tp.Any:
     await asyncio.gather(day_loop(), good_loop())
 
 
+async def probe_send() -> None:
+    probe_func = await bootstrap_for_probe()
+    await asyncio.gather(probe_func())
+
+
 @app.command()
 def run() -> None:
     """
@@ -23,6 +28,16 @@ def run() -> None:
     """
     print("Im running!")
     asyncio.run(start_service())
+
+
+@app.command()
+def probe() -> None:
+    """
+    Probe article parse and send
+    """
+    print("Probing...")
+    asyncio.run(probe_send())
+    print("Probe done!")
 
 
 # async def print_info(message: tp.Any) -> None:

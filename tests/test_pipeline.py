@@ -8,7 +8,7 @@ from dataclasses import asdict
 import pytest
 from tests.conftest import MockSender
 
-from src.models import ArticleDay, ArticleGood, RegionPublic, Article
+from src.models import Article, ArticleDay, ArticleGood, RegionPublic
 from src.pipeline import ArticleFlow
 from src.repo import Repository
 from src.scraper import Scraper
@@ -82,13 +82,15 @@ async def test_article_day_loop_not_empty_old_article(
 
 @pytest.mark.asyncio
 async def test_article_prune() -> None:
-    text = ("Считается одним из лучших нападающих в мире[4][5][6]. "
-            "Кавалер Командорского креста ордена Возрождения Польши[79]. "
-            "«Бе́шеные псы»[~ 1] (англ. Reservoir Dogs) — дебютный[~ 2] фильм. "
-            "в составе сборника на платформе iOS[⇨]. итальянский 3D-анимированный "
-            "Rainbow CGI[K 1] совместно с Rai Fictionruen, "
-            "Евге́ний Петро́вич Петро́в (настоящая фамилия — Катаев; 30 ноября "
-            "[13 декабря] 1902, Одесса")
+    text = (
+        "Считается одним из лучших нападающих в мире[4][5][6]. "
+        "Кавалер Командорского креста ордена Возрождения Польши[79]. "
+        "«Бе́шеные псы»[~ 1] (англ. Reservoir Dogs) — дебютный[~ 2] фильм. "
+        "в составе сборника на платформе iOS[⇨]. итальянский 3D-анимированный "
+        "Rainbow CGI[K 1] совместно с Rai Fictionruen, "
+        "Евге́ний Петро́вич Петро́в (настоящая фамилия — Катаев; 30 ноября "
+        "[13 декабря] 1902, Одесса"
+    )
     article = Article(
         region="ru",
         summary=text,
@@ -99,13 +101,15 @@ async def test_article_prune() -> None:
 
     await ArticleFlow.summary_prune(article=article)
 
-    assert article.summary == ("Считается одним из лучших нападающих в мире. "
-            "Кавалер Командорского креста ордена Возрождения Польши. "
-            "«Бе́шеные псы» (англ. Reservoir Dogs) — дебютный фильм. "
-            "в составе сборника на платформе iOS. итальянский 3D-анимированный "
-            "Rainbow CGI совместно с Rai Fictionruen, "
-            "Евге́ний Петро́вич Петро́в (настоящая фамилия — Катаев; 30 ноября "
-            "[13 декабря] 1902, Одесса")
+    assert article.summary == (
+        "Считается одним из лучших нападающих в мире. "
+        "Кавалер Командорского креста ордена Возрождения Польши. "
+        "«Бе́шеные псы» (англ. Reservoir Dogs) — дебютный фильм. "
+        "в составе сборника на платформе iOS. итальянский 3D-анимированный "
+        "Rainbow CGI совместно с Rai Fictionruen, "
+        "Евге́ний Петро́вич Петро́в (настоящая фамилия — Катаев; 30 ноября "
+        "[13 декабря] 1902, Одесса"
+    )
 
 
 @pytest.mark.asyncio
@@ -127,9 +131,9 @@ async def test_good_article_send1(
 @pytest.mark.asyncio
 @pytest.mark.freeze_time("2024-04-23 10:00:01", tick=True)
 async def test_good_article_send2(
-        session_factory: tp.Callable[[], tp.Any],
-        first_region: RegionPublic,
-        remove_old_data: None,
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    remove_old_data: None,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
     sender = MockSender()
@@ -143,9 +147,9 @@ async def test_good_article_send2(
 @pytest.mark.asyncio
 @pytest.mark.freeze_time("2024-04-23 9:00:01", tick=True)
 async def test_good_article_send3(
-        session_factory: tp.Callable[[], tp.Any],
-        first_region: RegionPublic,
-        remove_old_data: None,
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    remove_old_data: None,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
     sender = MockSender()
@@ -166,9 +170,9 @@ async def test_good_article_send3(
 @pytest.mark.asyncio
 @pytest.mark.freeze_time("2024-04-23 10:00:01", tick=True)
 async def test_good_article_send4(
-        session_factory: tp.Callable[[], tp.Any],
-        first_region: RegionPublic,
-        remove_old_data: None,
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    remove_old_data: None,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
     sender = MockSender()
@@ -189,9 +193,9 @@ async def test_good_article_send4(
 @pytest.mark.asyncio
 @pytest.mark.freeze_time("2024-04-23 11:00:01", tick=True)
 async def test_good_article_send5(
-        session_factory: tp.Callable[[], tp.Any],
-        first_region: RegionPublic,
-        remove_old_data: None,
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    remove_old_data: None,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
     sender = MockSender()
@@ -212,9 +216,9 @@ async def test_good_article_send5(
 @pytest.mark.asyncio
 @pytest.mark.freeze_time("2024-04-23 12:00:01", tick=True)
 async def test_good_article_send6(
-        session_factory: tp.Callable[[], tp.Any],
-        first_region: RegionPublic,
-        remove_old_data: None,
+    session_factory: tp.Callable[[], tp.Any],
+    first_region: RegionPublic,
+    remove_old_data: None,
 ) -> None:
     uow = UnitOfWork(db_collaborator=Repository, db_session_factory=session_factory)
     sender = MockSender()

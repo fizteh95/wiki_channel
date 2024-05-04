@@ -21,6 +21,7 @@ class Article:
     image_link: str | None
     summary: str
     send_time: datetime.datetime | None = None
+    title: str | None = None
 
 
 @dataclass

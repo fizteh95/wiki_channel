@@ -76,7 +76,13 @@ class ArticleFlow:
             counter += 1
             print(len(article.summary))
             index_of_last_dot = article.summary[:-1].rfind(".")
-            article.summary = article.summary[:index_of_last_dot + 1]
+            article.summary = article.summary[: index_of_last_dot + 1]
+        return
+
+    @staticmethod
+    async def add_title_link(article: Article) -> None:
+        header_code = f'<a href="{article.link}">{article.title}</a>\n'
+        article.summary = header_code + article.summary
         return
 
     async def send_article_day(self, last_article_day: ArticleDay | None, new_article: ArticleDay) -> bool:
@@ -150,9 +156,21 @@ class ArticleFlow:
             print(to_send)
             if not to_send:
                 return
+            await self.add_title_link(article=new_article_day)
             await self.summary_prune(article=new_article_day)
             await repo.create_article_of_day(article=new_article_day)
             await self.sender.send_article(article=new_article_day, region_channel=self.region.channel_id)
+
+    async def _probe_send(self) -> None:
+        try:
+            scraper = self.scraper()
+            new_article_good = await scraper.get_random_good_article(region=self.region)
+            await self.add_title_link(article=new_article_good)
+            await self.summary_prune(article=new_article_good)
+            await self.sender.send_article(article=new_article_good, region_channel=self.region.channel_id)
+            print("probe sent")
+        except Exception as e:
+            print(e)
 
     async def article_good_scheduled(self) -> None:
         scraper = self.scraper()
@@ -164,6 +182,7 @@ class ArticleFlow:
             if not to_send:
                 return
             new_article_good = await scraper.get_random_good_article(region=self.region)
+            await self.add_title_link(article=new_article_good)
             await self.summary_prune(article=new_article_good)
             print("pruned")
             await repo.create_good_article(article=new_article_good)
@@ -173,7 +192,7 @@ class ArticleFlow:
         while self.ad_loop:
             try:
                 await self.article_day_scheduled()
-                await asyncio.sleep(179)
+                await asyncio.sleep(1)
             except Exception as e:
                 print(f"ad loop exception: {e}")
                 await asyncio.sleep(1)
@@ -182,7 +201,7 @@ class ArticleFlow:
         while self.ag_loop:
             try:
                 await self.article_good_scheduled()
-                await asyncio.sleep(53)
+                await asyncio.sleep(1)
             except Exception as e:
                 print(f"ag loop exception: {e}")
-                await asyncio.sleep(180)
+                await asyncio.sleep(1)

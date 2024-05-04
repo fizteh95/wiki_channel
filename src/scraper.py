@@ -43,6 +43,10 @@ class Scraper(ArticleScraper):
         encoded_link = article_of_day.find("a").get("href")
         link = parse.unquote(encoded_link)
 
+        # getting title
+        title_selector = "#main-tfa > h2 > span.mw-headline > div.fake-heading.h2.main-header > a"
+        title = soup.select_one(selector=title_selector).text
+
         image_link = soup.select_one(selector="#main-tfa > div.main-box-content > figure > a")
         unquoted_image_link = parse.unquote(image_link.get("href"))
 
@@ -59,6 +63,7 @@ class Scraper(ArticleScraper):
             link=f"https://{region.country_code}.wikipedia.org" + link,
             image_link=image_link,
             summary=article_text,
+            title=title,
         )
         return article
 
@@ -111,8 +116,15 @@ class Scraper(ArticleScraper):
             if (start or stop) and not (start and stop):
                 res_text += child.text
 
+        # getting title
+        title_selector = "#firstHeading > span"
+        title_span = soup.select_one(selector=title_selector)
+        title = title_span.text
+
+        # getting image link
         images = soup.findAll("img")
         unquoted_image_link = ""
+        image_link = None
         for i in images:
             if i.get("alt") in ["Эта статья входит в число статей года", "Эта статья входит в число избранных"]:
                 continue
@@ -129,6 +141,7 @@ class Scraper(ArticleScraper):
             link=link,
             image_link=image_link,
             summary=res_text,
+            title=title,
         )
         return article
 

@@ -32,6 +32,7 @@ article_day_table = Table(
     Column("image_link", String),
     Column("summary", String),
     Column("send_time", DateTime(timezone=True), server_default=func.now()),
+    Column("title", String, nullable=True),
 )
 
 article_good_table = Table(
@@ -43,6 +44,7 @@ article_good_table = Table(
     Column("image_link", String),
     Column("summary", String),
     Column("send_time", DateTime(timezone=True), server_default=func.now()),
+    Column("title", String, nullable=True),
 )
 
 
