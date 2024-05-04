@@ -43,4 +43,4 @@ async def bootstrap_for_probe() -> tp.Any:
 
     sender = TgSender()
     article_flow = ArticleFlow(uow=uow, sender=sender, scraper=Scraper, region=regions[0])
-    return article_flow._probe_send()  # noqa
+    return article_flow._probe_send  # noqa
